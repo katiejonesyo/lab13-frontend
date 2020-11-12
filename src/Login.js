@@ -26,7 +26,7 @@ export default class Login extends Component {
         
         this.props.history.push('/todos');
         } catch(err){
-            this.setState({ err: 'oops!'})
+            this.setState({ err: 'Oops! Must have proper email to sign in.'})
         }
     }
 
