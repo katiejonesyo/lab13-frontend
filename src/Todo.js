@@ -4,6 +4,7 @@ import request from 'superagent';
 export default class Todos extends Component {
     state = {
         todos: [],
+        todoName:'',
         loading: false
     };
     
@@ -15,37 +16,40 @@ export default class Todos extends Component {
         const { token } = this.props;
 
         await this.setState({ loading: true });
-        const response = await request.get('https://warm-river-88711.herokuapp.com/api/todo')
+        const response = await request
+        .get('https://warm-river-88711.herokuapp.com/api/todo')
         .set('Authorization', token)
 
         await this.setState({ todos: response.body, loading: false })
     }
 
     handleSubmit = async (e) => {
-        const { todos, completed } = this.state;
+        const { todoName } = this.state;
         const { token } = this.props;
 
         e.preventDefault();
 
+    
+        this.setState({ loading: true });
+
         const newTodo = {
-            completed: completed,
-            todos: todos
+            todo: todoName
         };
 
-                await this.setState({ loading: true });
-
-        await request.post('https://warm-river-88711.herokuapp.com/api/todo')
+        await request
+        .post('https://warm-river-88711.herokuapp.com/api/todo')
         .send(newTodo)
         .set('Authorization', token)  ;
 
         await this.fetchTodos();
     }
 
-    handleWaterClick = async (someId) => {
+    handleCompletedClick = async (someId) => {
         const { token } = this.props;
 
        
-        await request.put(`https://warm-river-88711.herokuapp.com/api/todo${someId}`)
+        await request
+        .put(`https://warm-river-88711.herokuapp.com/api/todo/${someId}`)
         .set('Authorization', token)  ;
 
         await this.fetchTodos();
@@ -53,48 +57,42 @@ export default class Todos extends Component {
 
     render() {
         const { 
-            completed,  
+            todoName,  
             loading,
             todos,
          } = this.state;
 
         return (
             <div>
-                Welcome To Your Todos!
+                Your Todo List:
                 <form onSubmit={this.handleSubmit}>
                     <label>
-                        Add a todo:
+                        Add a task:
                         <input 
-                            value={todos} 
-                            onChange={(e) => this.setState({ todos: e.target.value })}
+                            value={todoName} 
+                            onChange={(e) => this.setState({ todoName: e.target.value })}
+                            type="text"
                         />
+                
                     </label>
-                    <label>
-                        Derp
-                        <input 
-                            
-                            value={completed} 
-                            onChange={(e) => this.setState({ completed: e.target.value })}
-                        />
-                    </label>
-                        <button>
+                    <button>
                             Add todo
                         </button>
-                      
-
+                   
                 </form>
                 {
                     loading 
                         ? 'loadingggggg' 
                         : todos.map(todo => <div key={`${todo.todo}${todo.id}${Math.random()}`} style={{ 
-                            textDecoration: todo.completed ? 'line-through' : 'none' }
-                        }>
-                        name: {todo.todo}
+                            textDecoration: todo.completed ? 'line-through' : 'none' }}>
+                        
+                        
+                        Task {todo.todoName}
                         {
-                            todo.completed ? '' : <button 
-                            // if you're ever onClicking inside of a map, you might need to make an anonymous function like this:
+                            todo.completed ? '' 
+                            : <button 
                                 onClick={() => this.handleCompletedClick(todo.id)}>
-                                Complete
+                                Completed
                             </button>
                         }
                         </div>)
